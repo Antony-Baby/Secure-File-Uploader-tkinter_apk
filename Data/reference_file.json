@@ -1,0 +1,27 @@
+{
+    "app_name": "Secure File Uploader",
+    "doc.docx": {
+        "author": "61341",
+        "user": "35133"
+    },
+    "xml.xml": {
+        "author": "94059",
+        "user": "88784"
+    },
+    "json.json": {
+        "author": "14051",
+        "user": "29724"
+    },
+    "html.html": {
+        "author": "53744",
+        "user": "87878"
+    },
+    "pdf.pdf": {
+        "author": "48872",
+        "user": "57166"
+    },
+    "text.txt": {
+        "author": "63857",
+        "user": "28143"
+    }
+}

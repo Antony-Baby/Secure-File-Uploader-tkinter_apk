@@ -1,0 +1,29 @@
+1. on download take a copy and decript and keep original file
+3. email subject - include the accessor email and details
+4. Ask to enter email and auto check in db and 
+    if the user is author - send one email /otp
+    if the user is receiver - send 2 mails/otp
+    if the user is not reg user - restrict  - send warnign to author
+
+
+todo
+
+copy and decrypt instead of working on the root file - done
+update dwnld tocken   - done
+
+check database entry before copying the file  - need to check the req
+create setup.py and requirement.txt for initial setup(need this if we need to run in another lap)
+
+need inputs on :
+    allow xampp developer access - can allow access but how to connect/update db
+        workaround - import db and install on his machine (Can't be a remote connection  
+        but we can prove that this will work anywhere if we have a remote repo(cloud to host))
+    Remote desktop
+    copy and download???
+        workaround...  can be use the same machine to download and the copy manually as we do now
+    if the workaround is ok.. then can be continue with the same code 
+
+    Default download loc or user spec (Seconf one will be bettr)
+
+
+
