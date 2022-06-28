@@ -12,6 +12,7 @@ build/
 develop-eggs/
 dist/
 # downloads/
+Archieve/
 eggs/
 .eggs/
 lib/
@@ -82,8 +83,6 @@ target/
 # IPython
 profile_default/
 ipython_config.py
-sfu_gui.py
-sfu_gu.py
 
 # pyenv
 .python-version
