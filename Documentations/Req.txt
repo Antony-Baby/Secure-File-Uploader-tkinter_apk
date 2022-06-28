@@ -26,4 +26,9 @@ need inputs on :
     Default download loc or user spec (Seconf one will be bettr)
 
 
+todo - GUI
+    Add Groups from DB - low priority
+    ADD drpdwn to choose file in download - low priority
+    Enhance view - high
+
 
