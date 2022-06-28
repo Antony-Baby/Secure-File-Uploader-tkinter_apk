@@ -13,7 +13,6 @@ from connector import sfu_database
 from sfu_data import method_type as mt
 from sendmail import sendmail
 import time
-# from colorama import Back, Fore, init
 
 root = tk.Tk()
 root.geometry("700x600")

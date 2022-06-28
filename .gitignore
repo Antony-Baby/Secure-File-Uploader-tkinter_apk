@@ -27,9 +27,6 @@ share/python-wheels/
 *.egg
 MANIFEST
 
-# files
-sfu_gui.py
-sfu_gu.py
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -85,6 +82,8 @@ target/
 # IPython
 profile_default/
 ipython_config.py
+sfu_gui.py
+sfu_gu.py
 
 # pyenv
 .python-version
