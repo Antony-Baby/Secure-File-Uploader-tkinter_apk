@@ -31,4 +31,11 @@ todo - GUI
     ADD drpdwn to choose file in download - low priority
     Enhance view - high
 
+    on incorrect - else case return to home? else add count to try 3 otp (prefer choice 1)
+
+drawback
+    on download - if there is one file with same name exists then the download wont be effective
+    (What happens is - system will try to decrypt that file)
+
+
 
