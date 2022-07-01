@@ -40,15 +40,18 @@ file_download_location = os.getcwd() + "/Downloads/"
 
 
 def hide_menu():
-  SFPMain.label_options.place_forget()
-  SFPMain.btn_upload.place_forget()
-  SFPMain.btn_download.place_forget()
-  SFPMain.label_title.place_forget()
+#   SFPMain.label_options.place_forget()
+#   SFPMain.btn_upload.place_forget()
+#   SFPMain.btn_download.place_forget()
+#   SFPMain.label_title.place_forget()
+    frame_Home.pack_forget()
 def showmenu():
-    SFPMain.label_options.place(x=200,y=200)
-    SFPMain.btn_upload.place(x=200,y=250)
-    SFPMain.btn_download.place(x=200,y=300)
-    SFPMain.label_title.place(x=10,y=60)
+    # SFPMain.label_options.place(x=200,y=200)
+    # SFPMain.btn_upload.place(x=200,y=250)
+    # SFPMain.btn_download.place(x=200,y=300)
+    # SFPMain.label_title.place(x=10,y=60)
+    frame_Home.pack(side=BOTTOM)
+
 
 class file_upload:
     def __init__(self) -> None:
@@ -319,36 +322,27 @@ class download:
                 SFPMain.return_home()
 
 class SFPMain:
-    # os.system('color 0A')
-    # subprocess.call('cls',shell=True)
-    # print(Fore.RED+banner)
-    # a = input(Fore.BLUE+Back.BLACK+"\n 1. Upload File\n 2. Download File \n Your input is: ")
     def return_home():
         frame_up.destroy()
         showmenu()
-    img = ImageTk.PhotoImage(Image.open("Data/title.jpg"))
-
-    label_title = tk.Label(root,image=img)
-    label_title.place(x=10,y=60)
-
-    label_options = tk.Label(root,text="Please choose the operation ")
+    img_bg = ImageTk.PhotoImage(Image.open("Data/title.jpg"))
+    img_upload = ImageTk.PhotoImage(Image.open("Data/upload.png"))
+    global frame_Home
+    frame_Home= tk.Frame(root,bg="white",width=900,height=600)
+    frame_Home.pack(side=BOTTOM)
+    label_title = tk.Label(frame_Home,image=img_bg)
+    label_title.place(x=0,y=0)
+    label_options = tk.Label(frame_Home,text="Please choose the operation ")
     label_options.place(x=370,y=300)
-    btn_upload = tk.Button(root,text="Upload File ", command=file_upload)
+    btn_upload = tk.Button(frame_Home,image=img_upload, command=file_upload)
     btn_upload.place(x=350,y=350)
-    btn_download = tk.Button(root,text="Download File ",command=download)
+    btn_download = tk.Button(frame_Home,text="Download File ",command=download)
     btn_download.place(x=450,y=350)
     btn_exit = tk.Button(root,text="EXIT",command=root.destroy)
     btn_exit.place(x=320,y=10)
     btn_return = tk.Button(root,text="Home",command=return_home)
     btn_return.place(x=450,y=10)
     
-    # con = str(input("\n Do you want to continue..?.(Y/N).  "))
-    # if(con.casefold()=='Y'):
-    #   SFPMain()
-    # else:
-    #   print("\n ...Thank You!!.... ")
-    #   exit()
-
 if __name__ == '__main__' :
     # Calling main function
     SFPMain()
