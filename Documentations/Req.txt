@@ -1,5 +1,4 @@
-
-todo
+Todo
 ------------
 1. on download take a copy and decript and keep original file  - done
 2. email subject - include the accessor email and details  - done
@@ -14,8 +13,7 @@ todo
 8. create batch file - pending
 9. Provide continue option once a operation is completed(do u wnt to contnue (y/N)?) - done
 
-
-clarifications 
+Clarifications 
 --------------
 1. check database entry before copying the file  - need to check the req
 2. auto list DL's (fetch from db and display) - ?
@@ -40,8 +38,6 @@ drawback
     on download - if there is one file with same name exists then the download wont be effective
     (What happens is - system will check for the filename and try to decrypt that file- no errors)
         NEED workaround??
-
-
 
 Workflow 
 ************

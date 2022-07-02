@@ -1,35 +1,19 @@
-from cProfile import label
-import subprocess
-from textwrap import wrap
 import tkinter as tk
-from tkinter import BOTTOM, END, Button, Image, StringVar, ttk
+from tkinter import BOTTOM, Image, StringVar, ttk
 import os
 import shutil
 from tkinter import filedialog
 from tkinter import messagebox
-from turtle import color
-from typing_extensions import IntVar
 #pip install cryptography
 from cryptography.fernet import Fernet
 import json
 import random
 from server import checkforelement, checkinjsonstring
 from connector import sfu_database
-from sfu_data import method_type as mt
+from sfu_data import method_type as mt, Images_GUI as img
 from sendmail import sendmail
 import time
 from PIL import ImageTk, Image
-
-
-
-banner = """ 
-  ____  _____ ____ _   _ ____  _____   _____ ___ _     _____   _   _ ____  _     ___    _    ____  _____ ____  
-/ ___|| ____/ ___| | | |  _ \| ____| |  ___|_ _| |   | ____| | | | |  _ \| |   / _ \  / \  |  _ \| ____|  _ \ 
-\___ \|  _|| |   | | | | |_) |  _|   | |_   | || |   |  _|   | | | | |_) | |  | | | |/ _ \ | | | |  _| | |_) |
- ___) | |__| |___| |_| |  _ <| |___  |  _|  | || |___| |___  | |_| |  __/| |__| |_| / ___ \| |_| | |___|  _ < 
-|____/|_____\____|\___/|_| \_\_____| |_|   |___|_____|_____|  \___/|_|   |_____\___/_/   \_\____/|_____|_| \_\ 
-
-"""
 
 root = tk.Tk()
 root.geometry("1000x650")
@@ -52,16 +36,18 @@ def showmenu():
     # SFPMain.label_title.place(x=10,y=60)
     frame_Home.pack(side=BOTTOM)
 
+def disableobject(element):
+    element.configure(state="disabled")
 
 class file_upload:
     def __init__(self) -> None:
         
         global frame_up
-        frame_up= tk.Frame(root,width=900,height=600)
+        frame_up= tk.Frame(root,width=900,height=585)
         frame_up.pack(side=BOTTOM)
-        self.img = ImageTk.PhotoImage(Image.open("Data/bg2.png"))
-        self.label_title = tk.Label(frame_up,image=self.img)
-        self.label_title.place(x=0,y=0)
+        self.img_bg_upload = ImageTk.PhotoImage(Image.open(img.bg_Upload))
+        self.label_bg = tk.Label(frame_up,image=self.img_bg_upload)
+        self.label_bg.place(x=0,y=0)
         hide_menu()
         # var = IntVar()
         self.label_file = tk.Label(frame_up,width=20,wraplength=200,padx=5,text="Enter the file name ")
@@ -75,7 +61,7 @@ class file_upload:
         self.label_email.place(x=100,y=200)
         self.inp_email = tk.Entry(frame_up,width=40)
         self.inp_email.place(x=300,y=200)
-        self.label_dl = tk.Label(frame_up,width=20,wraplength=200,padx=5,text="Enter the User Group name ")
+        self.label_dl = tk.Label(frame_up,width=20,wraplength=200,padx=5,text="Select the User Group name ")
         self.label_dl.place(x=100,y=250)
         opts=[
           "ALL",
@@ -86,9 +72,10 @@ class file_upload:
         self.dl.set("ALL")
         self.drp_dl = tk.OptionMenu(frame_up,self.dl,*opts)
         self.drp_dl.place(x=300,y=250)
-        self.btn_sub = tk.Button(frame_up,text="Continue",command=self.file_uploader)
+        self.btn_sub = tk.Button(frame_up,text="Upload and Secure the file",command=self.file_uploader)
         self.btn_sub.place(x=250,y=300)
     def file_uploader(self):
+        disableobject(self.btn_sub)
         file_name_with_location = str(self.filename)
         print(file_name_with_location)
             # a = input("\n Please enter file name with full path : ")
@@ -129,8 +116,15 @@ class file_upload:
                         # update_reference(reference_file)
                         print("\n....Updated Reference File....")
                         print("\n....File Upload Completed....")
-                        self.label_success = tk.Label(frame_up,text="Encryption Completed")
-                        self.label_success.place(x=120,y=360)
+                        time.sleep(1)
+                        res1=messagebox.showinfo("Success!!", "Your file is secured.. File Upload Completed")
+                        if res1=="ok":
+                            time.sleep(0.5)
+                            SFPMain.return_home()
+                        else:
+                            root.destroy()
+                        # # self.label_success = tk.Label(frame_up,text="Encryption Completed")
+                        # self.label_success.place(x=120,y=360)
 
 
                     else:
@@ -161,10 +155,10 @@ class download:
     def __init__(self):
         hide_menu()
         global frame_up
-        frame_up= tk.Frame(root,bg="white",width=900,height=600)
+        frame_up= tk.Frame(root,bg="white",width=900,height=585)
         frame_up.pack(side=BOTTOM)
-        self.img = ImageTk.PhotoImage(Image.open("Data/bg1.png"))
-        self.label_title = tk.Label(frame_up,image=self.img)
+        self.img_bg = ImageTk.PhotoImage(Image.open(img.bg_download))
+        self.label_title = tk.Label(frame_up,image=self.img_bg)
         self.label_title.place(x=0,y=0)
         self.label_filename = tk.Label(frame_up,width=25,wraplength=200,padx=5,text="Please enter file name to download (without path) :")
         self.label_filename.place(x=100,y=100)
@@ -174,8 +168,8 @@ class download:
         self.label_u_email.place(x=100,y=150)
         self.inp_u_email =tk.Entry(frame_up,width=40)
         self.inp_u_email.place(x=300,y=150)
-        self.label_send = tk.Button(frame_up,width=25,wraplength=200,padx=5,text="Send OTP for validation", command=self.verifyuser)
-        self.label_send.place(x=250,y=200)
+        self.btn_send = tk.Button(frame_up,width=25,wraplength=200,padx=5,text="Send OTP for validation", command=self.verifyuser)
+        self.btn_send.place(x=250,y=200)
         # self.directory =""
 
 
@@ -197,6 +191,7 @@ class download:
         return r_file
 
     def verifyuser(self):
+        disableobject(self.btn_send)
         self.file_name = str(self.inp_filename.get())
         if checkforelement(sfu_database(mt.files,self.file_name),self.file_name):
             self.doc = (sfu_database(mt.one_file,self.file_name))
@@ -232,6 +227,7 @@ class download:
             self.lable_message.place(x=100,y=300)   
     
     def verifyotp1(self):
+        disableobject(self.btn_otp1)
         e_otp = str(self.inp_otp1.get())
         self.end=time.time()
         t = (format(self.end-self.start))
@@ -257,8 +253,9 @@ class download:
             self.lable_message.place(x=100,y=300)
 
     def verify_otp2(self):
-        
+                
         if not self.author:
+            disableobject(self.btn_otp2)
             # sendmail("user",u_email,reference_file,file_name)
             e2_otp = str(self.inp_otp2.get())
             if e2_otp == reference_file[self.file_name]["user"]:
@@ -268,15 +265,16 @@ class download:
                 self.lable_message =tk.Label(frame_up,wraplength=200,width=25,padx=5,text="Invalid Otp 2")
                 self.lable_message.place(x=100,y=450)
                 exit()
-        self.Label_browse_dir = tk.Label(frame_up,wraplength=200,width=25,padx=5,text="Choose the destination folder")
-        self.Label_browse_dir.place(x=100,y=450)        
-        self.btn_browse_dir = tk.Button(frame_up,text="Browse folder",command=self.selectdirectory)
-        self.btn_browse_dir.place(x=300,y=450)
+        # self.Label_browse_dir = tk.Label(frame_up,wraplength=200,width=25,padx=5,text="Choose the destination folder")
+        # self.Label_browse_dir.place(x=100,y=450)        
+        self.btn_browse_dir = tk.Button(frame_up,width=30, text="Browse folder",command=self.selectdirectory)
+        self.btn_browse_dir.place(x=150,y=450)
         self.label_dir = tk.Label(frame_up,text="No Folder selected:  Default is Desktop")
         self.label_dir.place(x=400,y=450)
         
 
     def file_download(self):
+        disableobject(self.btn_download)
         print(self.directory)
         print("\n....Decrypting File....")
         shutil.copy(file_upload_location+self.file_name, self.directory)
@@ -312,8 +310,8 @@ class download:
         self.directory = filedialog.askdirectory (initialdir="/",title="Choose the folder")
         self.label_dir.configure(text="Folder selected: "+self.directory)
         if not self.directory=="":
-            btn_download = tk.Button(frame_up,text="Decrypt and Download the file",command=self.file_download)
-            btn_download.place(x=300,y=500)
+            self.btn_download = tk.Button(frame_up,text="Decrypt and Download the file",command=self.file_download)
+            self.btn_download.place(x=300,y=500)
         else:
             res1=messagebox.showwarning("Warning!!", "No folder selected.. Try again")
             if res1=="ok":
@@ -325,22 +323,26 @@ class SFPMain:
     def return_home():
         frame_up.destroy()
         showmenu()
-    img_bg = ImageTk.PhotoImage(Image.open("Data/title.jpg"))
-    img_upload = ImageTk.PhotoImage(Image.open("Data/upload.png"))
+    img_bg = ImageTk.PhotoImage(Image.open(img.bg_Home))
+    img_upload = ImageTk.PhotoImage(Image.open(img.btn_upload))
+    img_download = ImageTk.PhotoImage(Image.open(img.btn_download))
+    img_home = ImageTk.PhotoImage(Image.open(img.btn_home))
+    img_exit = ImageTk.PhotoImage(Image.open(img.btn_exit))
+
     global frame_Home
-    frame_Home= tk.Frame(root,bg="white",width=900,height=600)
+    frame_Home= tk.Frame(root,bg="white",width=900,height=580)
     frame_Home.pack(side=BOTTOM)
     label_title = tk.Label(frame_Home,image=img_bg)
     label_title.place(x=0,y=0)
     label_options = tk.Label(frame_Home,text="Please choose the operation ")
     label_options.place(x=370,y=300)
     btn_upload = tk.Button(frame_Home,image=img_upload, command=file_upload)
-    btn_upload.place(x=350,y=350)
-    btn_download = tk.Button(frame_Home,text="Download File ",command=download)
-    btn_download.place(x=450,y=350)
-    btn_exit = tk.Button(root,text="EXIT",command=root.destroy)
+    btn_upload.place(x=250,y=350)
+    btn_download = tk.Button(frame_Home,image=img_download,command=download)
+    btn_download.place(x=470,y=350)
+    btn_exit = tk.Button(root,image=img_exit,command=root.destroy)
     btn_exit.place(x=320,y=10)
-    btn_return = tk.Button(root,text="Home",command=return_home)
+    btn_return = tk.Button(root,image=img_home,command=return_home)
     btn_return.place(x=450,y=10)
     
 if __name__ == '__main__' :

@@ -1,3 +1,4 @@
+
 class sqlconfig:
     host="localhost"
     user="sfu"
@@ -19,3 +20,13 @@ class method_type:
     one_file = "single_doc_details"
     update_tocken ="update_tocken"
     dl_users ="dl_user_list"
+
+class Images_GUI:
+    bg_Home ="Data/title.jpg"
+    bg_Upload= "Data/bg2.jpg"
+    bg_download= "Data/bg1.jpg"
+    btn_upload = "Data/upload.png"
+    btn_download = "Data/download.png"
+    btn_exit = "Data/exit.png"
+    btn_home = "Data/home.png"
+
