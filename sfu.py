@@ -1,26 +1,27 @@
 import tkinter as tk
 from tkinter import BOTTOM, Image, StringVar, ttk
-import os
-import shutil
+import os,subprocess,shutil,json, random,time
 from tkinter import filedialog
 from tkinter import messagebox
 #pip install cryptography
 from cryptography.fernet import Fernet
-import json
-import random
-from server import checkforelement, checkinjsonstring
-from connector import sfu_database
-from sfu_data import method_type as mt, Images_GUI as img
+from server import checkforelement, checkinjsonstring,sfu_database
+# from connector import sfu_database
+from sfu_data import method_type as mt, Images_GUI as img,GUI_size as size
 from sendmail import sendmail
-import time
 from PIL import ImageTk, Image
 
 root = tk.Tk()
-root.geometry("1000x650")
+# root.geometry("1000x650")
+root.state('zoomed')
 file_upload_location = os.getcwd() + "/upload_location/"
 reference_file = json.loads(open(os.getcwd() + "/Data/reference_file.json","r").read())
 employees = sfu_database(mt.emp_emails,"")
 file_download_location = os.getcwd() + "/Downloads/"
+
+
+# os.makedirs(file_download_location, 0o666)
+
 
 
 def hide_menu():
@@ -39,30 +40,53 @@ def showmenu():
 def disableobject(element):
     element.configure(state="disabled")
 
+def pop_message(type,header,text,obj):
+    time.sleep(1)
+    if type.casefold()=="info":
+        res1=messagebox.showinfo(header, text)
+        if res1=="ok":
+            time.sleep(0.5)
+            SFPMain.return_home()
+        else:
+            root.destroy()
+    elif type.casefold()=="warning":
+        res1=messagebox.showwarning(header, text)
+        if res1=="ok":
+            time.sleep(0.5)
+            obj.configure(state="normal")
+            # SFPMain.return_home()
+        # else:
+        #     root.destroy()
+    else:
+        res1=messagebox.showinfo("Invalid type", "Debug")
+
 class file_upload:
     def __init__(self) -> None:
-        
         global frame_up
-        frame_up= tk.Frame(root,width=900,height=585)
+        frame_up= tk.Frame(root,width=size.f_width,height=size.f_heigh)
         frame_up.pack(side=BOTTOM)
         self.img_bg_upload = ImageTk.PhotoImage(Image.open(img.bg_Upload))
         self.label_bg = tk.Label(frame_up,image=self.img_bg_upload)
         self.label_bg.place(x=0,y=0)
         hide_menu()
         # var = IntVar()
-        self.label_file = tk.Label(frame_up,width=20,wraplength=200,padx=5,text="Enter the file name ")
+        self.label_file = tk.Label(frame_up,width=size.lbl_med,wraplength=200,padx=5,text="Choose the file name ")
         self.label_file.place(x=100,y=150)
         # self.inp_file = tk.Entry(frame_up)
-        self.btn_browse = tk.Button(frame_up,width=25,text="Browse files",command=self.browsefiles)
+        self.filename=""
+        self.btn_browse = tk.Button(frame_up,width=size.btn_med,text="Browse files",command=self.browsefiles)
         self.btn_browse.place(x=300,y=150)
         self.label_path = tk.Label(frame_up,padx=5,text="No files selected")
         self.label_path.place(x=500,y=150)
-        self.label_email = tk.Label(frame_up,width=20,wraplength=200,padx=5,text="Enter the email id ")
+        self.label_email = tk.Label(frame_up,width=size.lbl_med,wraplength=200,padx=5,text="Enter the email id ")
         self.label_email.place(x=100,y=200)
-        self.inp_email = tk.Entry(frame_up,width=40)
+        self.inp_email = tk.Entry(frame_up,width=size.txt_large)
         self.inp_email.place(x=300,y=200)
-        self.label_dl = tk.Label(frame_up,width=20,wraplength=200,padx=5,text="Select the User Group name ")
+        self.label_dl = tk.Label(frame_up,width=size.lbl_med,wraplength=200,padx=5,text="Select the User Group name ")
         self.label_dl.place(x=100,y=250)
+        
+        # self.dls = sfu_database(mt.dls,"")
+        # print(self.dls)
         opts=[
           "ALL",
           "Admin",
@@ -76,87 +100,78 @@ class file_upload:
         self.btn_sub.place(x=250,y=300)
     def file_uploader(self):
         disableobject(self.btn_sub)
-        file_name_with_location = str(self.filename)
-        print(file_name_with_location)
-            # a = input("\n Please enter file name with full path : ")
-        if os.path.exists(file_name_with_location):
-            b = self.inp_email.get()
-            user_email = str(b)
-            if len(user_email) > 0:
-                    if checkforelement(employees,user_email):
-                        c=self.dl.get()
-                        print(c)
-                        DL=str(c)
-                        print("\n....Saving File....")
-                        shutil.copy(file_name_with_location, file_upload_location)
-                        key = Fernet.generate_key() 
-                        print("\n....Encrypting File....")
-                        fernet = Fernet(key)
-                        fObj = open(file_name_with_location,"r")
-                        filename = (os.path.basename(fObj.name))
-                        # reading uploaded file
-                        with open(file_upload_location + filename, 'rb') as file:
-                            original = file.read()
-                        # encrypting the file
-                        encrypted = fernet.encrypt(original)
-                        # writing the encrypted data
-                        with open(file_upload_location + filename, 'wb') as encrypted_file:
-                            encrypted_file.write(encrypted)
-                        print("\n....Encryption Completed....")
-                        # self.label_success.place(x=120,y=360)
-                        # update refence file
-                        reference_file= {
-                        "doc_name" : filename,
-                        "user_email": user_email,
-                        "DL": DL,
-                        "key" : key.decode('UTF-8'),
-                        "tocken" : 0
-                        }
-                        res =sfu_database(mt.update_ref,reference_file)
-                        # update_reference(reference_file)
-                        print("\n....Updated Reference File....")
-                        print("\n....File Upload Completed....")
-                        time.sleep(1)
-                        res1=messagebox.showinfo("Success!!", "Your file is secured.. File Upload Completed")
-                        if res1=="ok":
-                            time.sleep(0.5)
-                            SFPMain.return_home()
+        # print(self.dl.get())
+        if not self.filename=="":
+            # pop_message("warning","oops Failed!!","Please choose a File.. Try again",self.btn_sub)
+            # file_upload
+            file_name_with_location = str(self.filename)
+            print(file_name_with_location)
+                # a = input("\n Please enter file name with full path : ")
+            if os.path.exists(file_name_with_location):
+                b = self.inp_email.get()
+                user_email = str(b)
+                if len(user_email) > 0:
+                        if checkforelement(employees,user_email):
+                            c=self.dl.get()
+                            print(c)
+                            DL=str(c)
+                            print("\n....Saving File....")
+                            shutil.copy(file_name_with_location, file_upload_location)
+                            # p = subprocess.Popen(["scp", file_name_with_location, "ANTONY@192.168.1.4:F:\Secure-File-Uploader_tkinter"])
+                            # sts = os.waitpid(p.pid, 0)
+                            # print(sts)
+                            key = Fernet.generate_key() 
+                            print("\n....Encrypting File....")
+                            fernet = Fernet(key)
+                            fObj = open(file_name_with_location,"r")
+                            filename = (os.path.basename(fObj.name))
+                            # reading uploaded file
+                            with open(file_upload_location + filename, 'rb') as file:
+                                original = file.read()
+                            # encrypting the file
+                            encrypted = fernet.encrypt(original)
+                            # writing the encrypted data
+                            with open(file_upload_location + filename, 'wb') as encrypted_file:
+                                encrypted_file.write(encrypted)
+                            print("\n....Encryption Completed....")
+                            # self.label_success.place(x=120,y=360)
+                            # update refence file
+                            reference_file= {
+                            "doc_name" : filename,
+                            "user_email": user_email,
+                            "DL": DL,
+                            "key" : key.decode('UTF-8'),
+                            "tocken" : 0
+                            }
+                            res =sfu_database(mt.update_ref,reference_file)
+                            # update_reference(reference_file)
+                            print("\n....Updated Reference File....")
+                            pop_message("info","Success!!","Your file is secured.. File Upload Completed","")
                         else:
-                            root.destroy()
-                        # # self.label_success = tk.Label(frame_up,text="Encryption Completed")
-                        # self.label_success.place(x=120,y=360)
+                            pop_message("warning","oops Failed!!","Given Email id not a registered Employee.., Try again",self.btn_sub)
 
-
-                    else:
-                        print("Given Email id not a registered Employee")
-                        self.label_success = tk.Label(frame_up,text="Given Email id not a registered Employee")
-                        self.label_success.place(x=120,y=360)
-
+                else:
+                    pop_message("warning","oops Failed!!","Email id required.. Try again",self.btn_sub)
             else:
-                print("\nEmail id required")
-                self.label_success = tk.Label(frame_up,text="Email id required")
-                self.label_success.place(x=120,y=360)
-
-
+                pop_message("warning","oops Failed!!","Invalid File.. Try again",self.btn_sub)
         else:
-            self.label_success = tk.Label(frame_up,text="Invalid File")
-            self.label_success.place(x=120,y=360)
+            pop_message("warning","oops Failed!!","Please choose a File..",self.btn_sub)
+            
     def browsefiles(self):
-        self.filename = filedialog.askopenfilename(initialdir = "/",
-                                          title = "Select a File",
+        self.filename = filedialog.askopenfilename(title = "Select a File",
                                           filetypes = (("Text files",
                                                         "*.txt*"),
                                                        ("all files",
                                                         "*.*")))
         self.label_path.configure(text="File selected: "+self.filename)
-        
 
 class download:
     def __init__(self):
         hide_menu()
         global frame_up
-        frame_up= tk.Frame(root,bg="white",width=900,height=585)
-        frame_up.pack(side=BOTTOM)
+        frame_up= tk.Frame(root,bg="white",width=size.f_width,height=size.f_heigh)
+        frame_up.pack()
+        # img.resize((300,205), Image.ANTIALIAS)
         self.img_bg = ImageTk.PhotoImage(Image.open(img.bg_download))
         self.label_title = tk.Label(frame_up,image=self.img_bg)
         self.label_title.place(x=0,y=0)
@@ -170,8 +185,6 @@ class download:
         self.inp_u_email.place(x=300,y=150)
         self.btn_send = tk.Button(frame_up,width=25,wraplength=200,padx=5,text="Send OTP for validation", command=self.verifyuser)
         self.btn_send.place(x=250,y=200)
-        # self.directory =""
-
 
     def update_otp(r_data):
         d_str = json.dumps(r_data, indent = 4)
@@ -213,16 +226,18 @@ class download:
                     self.btn_otp1.place(x=250,y=300)
                 else:
                     # sendmail("warning",self.doc[1],u_email,file_name)
+                    pop_message("warning","oops Failed!!","You are not authorized to access this file. Please contact admin for access...",self.btn_send)
                     print("\n...You are not authorized to access this file. Please contact admin for access...")
-                    self.lable_message =tk.Label(frame_up,wraplength=200,width=25,padx=5,text="You are not authorized to access this file. Please contact admin for access...")
-                    self.lable_message.place(x=100,y=300)
             else:
                 # sendmail("warning",self.doc[1],u_email,file_name)
+                pop_message("warning","oops Failed!!","Sorry! You are not a registered user, Please contact admin...",self.btn_send)
                 print("\n..Sorry! You are not a registered user, Please contact admin...")
                 self.lable_message =tk.Label(frame_up,width=25,wraplength=200,padx=5,text="Sorry! You are not a registered user, Please contact admin...")
                 self.lable_message.place(x=100,y=300)
         else:
             print("\nInvalid File")
+            pop_message("warning","oops Failed!!","Invalid file name...",self.btn_send)
+
             self.lable_message =tk.Label(frame_up,wraplength=200,width=25,padx=5,text="Invalid File")
             self.lable_message.place(x=100,y=300)   
     
@@ -249,11 +264,13 @@ class download:
                 self.verify_otp2()
         else:
             print("\nInvalid Otp")
+            #add cout 3
+            pop_message("warning","oops Failed!!","Invalid Otp Try again...",self.btn_otp1)
+
             self.lable_message =tk.Label(frame_up,wraplength=200,width=25,padx=5,text="Invalid Otp")
             self.lable_message.place(x=100,y=300)
 
     def verify_otp2(self):
-                
         if not self.author:
             disableobject(self.btn_otp2)
             # sendmail("user",u_email,reference_file,file_name)
@@ -262,6 +279,7 @@ class download:
                 pass
             else:
                 print("Invalid otp 2")
+                pop_message("warning","oops Failed!!","Invalid Otp.. Try again...",self.btn_otp2)
                 self.lable_message =tk.Label(frame_up,wraplength=200,width=25,padx=5,text="Invalid Otp 2")
                 self.lable_message.place(x=100,y=450)
                 exit()
@@ -269,13 +287,12 @@ class download:
         # self.Label_browse_dir.place(x=100,y=450)        
         self.btn_browse_dir = tk.Button(frame_up,width=30, text="Browse folder",command=self.selectdirectory)
         self.btn_browse_dir.place(x=150,y=450)
-        self.label_dir = tk.Label(frame_up,text="No Folder selected:  Default is Desktop")
+        self.label_dir = tk.Label(frame_up,text="No Folder selected:  ")
         self.label_dir.place(x=400,y=450)
-        
 
     def file_download(self):
         disableobject(self.btn_download)
-        print(self.directory)
+        # print(self.directory)
         print("\n....Decrypting File....")
         shutil.copy(file_upload_location+self.file_name, self.directory)
         key = self.doc[2]
@@ -304,10 +321,9 @@ class download:
             SFPMain.return_home()
         else:
             root.destroy()
-        
 
     def selectdirectory(self):
-        self.directory = filedialog.askdirectory (initialdir="/",title="Choose the folder")
+        self.directory = filedialog.askdirectory (title="Choose the folder")
         self.label_dir.configure(text="Folder selected: "+self.directory)
         if not self.directory=="":
             self.btn_download = tk.Button(frame_up,text="Decrypt and Download the file",command=self.file_download)
@@ -328,22 +344,27 @@ class SFPMain:
     img_download = ImageTk.PhotoImage(Image.open(img.btn_download))
     img_home = ImageTk.PhotoImage(Image.open(img.btn_home))
     img_exit = ImageTk.PhotoImage(Image.open(img.btn_exit))
-
+    frame_Header= tk.Frame(root,width=900,height=50)
+    frame_Header.pack()
     global frame_Home
-    frame_Home= tk.Frame(root,bg="white",width=900,height=580)
-    frame_Home.pack(side=BOTTOM)
+    frame_Home= tk.Frame(root,width=1000,height=620)
+    frame_Home.pack()
+    frame_footer= tk.Frame(root,width=1000,height=50)
+    frame_footer.pack(side=BOTTOM)
     label_title = tk.Label(frame_Home,image=img_bg)
     label_title.place(x=0,y=0)
-    label_options = tk.Label(frame_Home,text="Please choose the operation ")
-    label_options.place(x=370,y=300)
+    label_options = tk.Label(frame_Home,width=size.lbl_large,text="Please choose the operation ",bg="white")
+    label_options.place(x=300,y=300)
     btn_upload = tk.Button(frame_Home,image=img_upload, command=file_upload)
     btn_upload.place(x=250,y=350)
     btn_download = tk.Button(frame_Home,image=img_download,command=download)
     btn_download.place(x=470,y=350)
-    btn_exit = tk.Button(root,image=img_exit,command=root.destroy)
+    btn_exit = tk.Button(frame_Header,width=15,text="EXIT",command=root.destroy)
     btn_exit.place(x=320,y=10)
-    btn_return = tk.Button(root,image=img_home,command=return_home)
+    btn_return = tk.Button(frame_Header,width=15, text="HOME",command=return_home)
     btn_return.place(x=450,y=10)
+    label_credit = tk.Label(frame_footer,width=50,padx=5,text="Created by Jomet joy")
+    label_credit.place(x=300,y=10)
     
 if __name__ == '__main__' :
     # Calling main function

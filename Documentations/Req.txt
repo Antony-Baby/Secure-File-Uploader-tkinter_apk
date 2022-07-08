@@ -23,6 +23,8 @@ Clarifications
     ADD drpdwn to choose file in download - low priority
     Enhance view - 
     on incorrect - else case return to home? else add count to try 3 otp (prefer choice 1)
+5. If the folder is not selected(download loc). show warning or use a default location ???(currently - warning)
+6. New change - Removed the connector.py and merged with server(Confrm which one is more understandble)
 
 pending works :
     allow xampp developer access - can allow access but how to connect/update db
