@@ -1,4 +1,8 @@
-from sfu_data import sqls
+import mysql.connector
+# print("Content-Type: text/html\n\n")
+import sys
+sys.path.append(r"C:\Users\Antony\AppData\Local\Programs\Python\Python37/python.exe")
+from sfu_data import sqlconfig as config,sqls
 
 def employees(cursor):
     # cursor.execute("SELECT COUNT(*) FROM information_schema.columns WHERE table_name= 'employee'")
@@ -50,6 +54,10 @@ def retreiveDLusers(cursor,filename):
     cursor.execute(sqls.sql_retrieveDLuserlist,val)
     return ((cursor.fetchall()))
 
+def retreiveDLNames(cursor):
+    cursor.execute(sqls.sql_DLnames)
+    return ((cursor.fetchall()))
+
 def update_references(mydb,cursor,ref_file):
         sql = sqls.sql_update_tocken
         val = (ref_file['tocken'],ref_file['doc_name'])
@@ -57,6 +65,37 @@ def update_references(mydb,cursor,ref_file):
         mydb.commit()
         return True
 
+def sfu_database(method,params):
+    mydb = mysql.connector.connect(
+        host=config.host,
+        user=config.user,
+        password=config.password,
+        database="sfu_db",
+        auth_plugin= config.auth_plugin
+    )
+    cursor = mydb.cursor()
 
+    if method.casefold()=="user_emails":
+        res= employees(cursor)
+    elif method.casefold()=="update_reference":
+        res=insert_references(mydb,cursor,params)
+    # elif method.casefold()=="check_element":
+        # return checkforelement(mydb,cursor,params)
+    elif method.casefold()=="fetch_files":
+        res= all_files(cursor)
+    elif method.casefold()=="single_doc_details":
+        res= retreiveonedoc(cursor,params)
+    elif method.casefold()=="update_tocken":
+        res = update_references(mydb,cursor,params)
+    elif method.casefold()=="dl_user_list":
+        res= retreiveDLusers(cursor,params)
+    elif method.casefold()=="dl_list":
+        res= retreiveDLNames(cursor)
+    else:
+        print("Invalid method")
+
+    cursor.close()
+    mydb.close()
+    return res
 
 

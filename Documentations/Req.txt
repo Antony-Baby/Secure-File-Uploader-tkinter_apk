@@ -1,34 +1,58 @@
-1. on download take a copy and decript and keep original file
-3. email subject - include the accessor email and details
-4. Ask to enter email and auto check in db and 
-    if the user is author - send one email /otp
-    if the user is receiver - send 2 mails/otp
-    if the user is not reg user - restrict  - send warnign to author
+Todo
+------------
+1. on download take a copy and decript and keep original file  - done
+2. email subject - include the accessor email and details  - done
+3. Ask to enter email and auto check in db and  - done
+    if the user is author - send one email /otp - done
+    if the user is receiver - send 2 mails/otp - done
+    if the user is not reg user - restrict  - send warnign to author - done conding (need to update the content)
+4. copy and decrypt instead of working on the root file - done
+5. update dwnld tocken   - done
+6. user specified download location - done
+7. create setup.py and requirement.txt for initial setup(need this if we need to run in another lap) - pending
+8. create batch file - pending
+9. Provide continue option once a operation is completed(do u wnt to contnue (y/N)?) - done
 
+Clarifications 
+--------------
+1. check database entry before copying the file  - need to check the req
+2. auto list DL's (fetch from db and display) - ?
+3. download(provide list of files available in the system) -- ??
+4. GUI
+    Add Groups from DB - low priority
+    ADD drpdwn to choose file in download - low priority
+    Enhance view - 
+    on incorrect - else case return to home? else add count to try 3 otp (prefer choice 1)
+5. If the folder is not selected(download loc). show warning or use a default location ???(currently - warning)
+6. New change - Removed the connector.py and merged with server(Confrm which one is more understandble)
 
-todo
-
-copy and decrypt instead of working on the root file - done
-update dwnld tocken   - done
-
-check database entry before copying the file  - need to check the req
-create setup.py and requirement.txt for initial setup(need this if we need to run in another lap)
-
-need inputs on :
+pending works :
     allow xampp developer access - can allow access but how to connect/update db
         workaround - import db and install on his machine (Can't be a remote connection  
         but we can prove that this will work anywhere if we have a remote repo(cloud to host))
     Remote desktop
     copy and download???
         workaround...  can be use the same machine to download and the copy manually as we do now
-    if the workaround is ok.. then can be continue with the same code 
+    if the workaround is ok.. then can be continue with the same code (sol : need to download to local)
 
-    Default download loc or user spec (Seconf one will be bettr)
+drawback
+---------------------
+    on download - if there is one file with same name exists then the download wont be effective
+    (What happens is - system will check for the filename and try to decrypt that file- no errors)
+        NEED workaround??
 
+Workflow 
+************
 
-todo - GUI
-    Add Groups from DB - low priority
-    ADD drpdwn to choose file in download - low priority
-    Enhance view - high
-
-
+Set up our machine as server/host machine and can be connect with second machine
+Set up and config XAMPP DB in server machine(With developer access)    
+    with dev access , can be read/write from locally connected devices(Need to confrm)
+for initial run , Run setup.py in the second machine
+    (to install all the libraries required for our project , which are listed in requirements.py folder)
+upload-
+    create a shared path in remote machine to save files
+    upload/copy files from local to remote and encrypt and save details on the db stored in server
+Download -
+    get info from db(server machine db) and verify , once verified , 
+            decrypt and downld/copy to the location selected by the user
+    update count in DB.
